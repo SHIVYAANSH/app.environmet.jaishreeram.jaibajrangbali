@@ -646,7 +646,6 @@ header {
 
   <div class="search-bar">
     <div class="search-wrapper">
-      <div id="searchTooltip" class="search-tooltip">🔍 Start typing a location here to view the 7-day forecast!</div>
       <input type="text" id="manualLocation" placeholder="Enter a location..." autocomplete="off" />
       <ul id="suggestions"></ul>
     </div>
@@ -756,36 +755,7 @@ header {
     summaryEl.innerHTML = `<strong>🧠 AI Summary:</strong><br>${output}`;
   }
 
-  // Tooltip + Glow after splash
-  window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-      const loaderOverlay = document.getElementById("loaderOverlay");
-      loaderOverlay?.classList.add("fade-out");
-
-      setTimeout(() => {
-        input.classList.add("search-focus-highlight");
-
-        const tooltip = document.createElement("div");
-        tooltip.id = "searchTooltip";
-        tooltip.className = "search-tooltip";
-        tooltip.innerHTML = `<span>🔍 Tip:</span> Type your location to view forecast`;
-        input.parentElement.appendChild(tooltip);
-
-        const stopGuide = () => {
-          input.classList.remove("search-focus-highlight");
-          tooltip.remove();
-          input.removeEventListener("input", stopGuide);
-          input.removeEventListener("focus", stopGuide);
-        };
-
-        setTimeout(stopGuide, 5000);
-        input.addEventListener("input", stopGuide);
-        input.addEventListener("focus", stopGuide);
-
-      }, 600);
-    }, 5000);
-  });
-
+  
   // Scroll indicator click → scroll to forecast
   document.getElementById("scrollArrow").addEventListener("click", () => {
     forecastDisplay.scrollIntoView({ behavior: 'smooth' });
