@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EcoSphere</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #chartPlaceholder {
+      width: 100%;
+      height: 300px;
+      background: repeating-linear-gradient(
+        45deg,
+        #f4f4f5,
+        #f4f4f5 10px,
+        #e5e7eb 10px,
+        #e5e7eb 20px
+      );
+      border-radius: 12px;
+      border: 2px dashed #22c55e;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    
+    #chartPlaceholder::before {
+      content: "📈 Pollution Index chart will appear here once a location is selected";
+      font-size: 15px;
+      font-weight: 600;
+      color: #15803d;
+      padding: 0 20px;
+      line-height: 1.5;
+      animation: fadeUp 1.5s ease-out;
+      text-wrap: balance;
+    }
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* === Left-side Metrics Styles === */
+.metric-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 15.5px;
+}
+
+.metric-row i {
+  font-size: 18px;
+  color: #16a34a;
+}
+
+.metric-label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Highlight AQI dynamically if needed */
+#pollution {
+  font-weight: 700;
+  font-size: 15.5px;
+}
+
+        
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #1f2937;
+    }
+
+    header {
+      background: #d1fae5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #065f46;
+    }
+
+    .top-nav a {
+      margin-left: 10px;
+      font-size: 15px;
+      padding: 8px 12px;
+      background: #ecfdf5;
+      border: 2px solid #16a34a;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #065f46;
+      transition: 0.3s;
+    }
+
+    .top-nav a:hover {
+      background: #d1fae5;
+      border-color: #15803d;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+      max-width: 500px;
+    }
+
+    #manualLocation {
+      width: 100%;
+      padding: 10px 40px 10px 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    #micBtn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      cursor: pointer;
+      color: #15803d;
+    }
+
+    #micBtn.listening {
+      animation: pulseMic 1s infinite ease-in-out;
+      color: red;
+    }
+
+    @keyframes pulseMic {
+      0%, 100% { transform: translateY(-50%) scale(1); }
+      50% { transform: translateY(-50%) scale(1.2); }
+    }
+
+    .suggestion-box {
+      width: 100%;
+      position: relative;
+    }
+
+    #suggestions {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      max-height: 220px;
+      overflow-y: auto;
+      position: absolute;
+      z-index: 99;
+    }
+
+    #suggestions li {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    #suggestions li:hover {
+      background: #f0fdf4;
+    }
+
+    .dashboard {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      flex: 1 1 48%;
+    }
+
+    .chart-card {
+      min-width: 300px;
+    }
+
+    #pollutionChart {
+      display: none;
+      width: 100% !important;
+      max-height: 300px;
+    }
+
+    #chartPlaceholder {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #f3f4f6,
+        #f3f4f6 10px,
+        #e5e7eb 10px,
+        #e5e7eb 20px
+      );
+    }
+
+    #loaderOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      opacity: 1;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    #loaderOverlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .eco-orbit-loader {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .eco-core {
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle, #22c55e, #16a34a);
+      border-radius: 50%;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    .orbit-ring {
+      width: 80px;
+      height: 80px;
+      border: 2px dashed rgba(34, 197, 94, 0.4);
+      border-radius: 50%;
+      position: absolute;
+      animation: spinRing 3s linear infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); transform: scale(1); }
+      50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); transform: scale(1.1); }
+      100% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); transform: scale(1); }
+    }
+
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      margin-top: 16px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #15803d;
+      animation: fadeText 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes fadeText {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        flex-direction: column;
+      }
+
+      .card {
+        flex: 1 1 100%;
+      }
+
+      .top-nav {
+        margin-top: 10px;
+      }
+
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-wrapper {
+        width: 100%;
+      }
+    }
+
+
+/* 🔍 Smooth Search Focus Highlight */
+.search-focus-highlight {
+  animation: greenGlow 1.4s ease-in-out infinite;
+  border: 2px solid #22c55e !important;
+  border-radius: 8px;
+}
+
+@keyframes greenGlow {
+  0% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); }
+  50% { box-shadow: 0 0 15px 4px rgba(34, 197, 94, 0.5); }
+  100% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); }
+}
+
+/* 🧠 Tooltip styling */
+.search-tooltip {
+  position: absolute;
+  top: -58px;
+  left: 0;
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  animation: fadeInUp 0.4s ease forwards;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 25px;
+  border: 8px solid transparent;
+  border-top-color: #ecfdf5;
+}
+
+/* ✨ Animate */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+
+
+/* 📱 Responsive & Modern Permission-Popup Inspired UI */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f1f5f9;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #d1fae5;
+  padding: 16px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0 0 12px 12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.top-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.top-nav a {
+  background-color: #ecfdf5;
+  border: 2px solid #16a34a;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 15px;
+  color: #065f46;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.top-nav a:hover {
+  background: #bbf7d0;
+  color: #064e3b;
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 24px auto 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#manualLocation {
+  width: 100%;
+  padding: 12px 50px 12px 16px;
+  font-size: 16px;
+  border: 2px solid #16a34a;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.2s;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.1);
+}
+
+#manualLocation:focus {
+  border-color: #065f46;
+  background: #f0fdf4;
+}
+
+#micBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #16a34a;
+  cursor: pointer;
+}
+
+#micBtn.listening {
+  animation: pulseMic 1s infinite ease-in-out;
+  color: red;
+}
+
+@keyframes pulseMic {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.2); }
+}
+
+#searchTooltip {
+  display: none;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  color: #065f46;
+  border-left: 5px solid #16a34a;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 15px;
+  text-align: center;
+  animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 🧾 Chart Placeholder */
+#chartPlaceholder {
+  width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #f1f5f9,
+    #f1f5f9 10px,
+    #e2e8f0 10px,
+    #e2e8f0 20px
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #15803d;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 15px;
+  border: 2px dashed #22c55e;
+  box-shadow: inset 0 0 0 3px #bbf7d0;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <!-- 🌀 Loader -->
+  <div id="loaderOverlay">
+    <div class="eco-orbit-loader">
+      <div class="eco-core"></div>
+      <div class="orbit-ring"></div>
+    </div>
+    <div class="loader-text">Sensing Earth’s Vital Signs...</div>
+  </div>
+
+  <header>
+    <div class="logo">🥬 <strong>EcoSphere</strong></div>
+    <nav class="top-nav">
+      <a href="index.html">📊 Dashboard</a>
+      <a href="chatbot.html">🤖 Ask AI</a>
+      <a href="weather.html">🌤️ Weather Forecast</a>
+      <a href="sol.html">💡 Solutions</a>
+    </nav>
+  </header>
+
+  <!-- 🔍 Location Search -->
+  <div class="search-container">
+    <div class="search-wrapper">
+      <div class="search-wrapper" style="position: relative;">
+        <input type="text" id="manualLocation" placeholder="Enter your city to get live air quality & weather
+
+">
+        <div id="searchTooltip" class="search-tooltip" style="display: none;">
+          🌍 Start by searching your city to explore real-time data
+        </div>
+              </div>
+      
+      <ul id="suggestions"></ul>
+    </div>
+  </div>
+
+  <!-- 📊 Dashboard -->
+  <main class="dashboard">
+    <section class="card chart-card">
+      <h2>🌍 Real-Time Environmental Quality Dashboard</h2>
+      <div id="locationDisplay">📍 Please select a location to begin...</div>
+      <p>🌤️ Temp: <strong id="temp">--</strong></p>
+      <p>🌫 Humidity: <strong id="humidity">--</strong></p>
+      <p>⚠️ Pollution Index: <strong id="pollution">--</strong></p>
+      <div id="chartPlaceholder"></div>
+      <canvas id="pollutionChart"></canvas>
+    </section>
+
+    <section class="card info-card">
+      <div id="aqi-advice-box" style="background: #f9f9f9; border-left: 4px solid #999; border-radius: 8px; padding: 16px;">
+        
+        <p style="font-weight: bold; font-size: 18px; margin: 0 0 10px;">🫁 Health Advisory</p>
+    
+        <h3 id="aqi-level-heading" style="margin-top: 0;">Loading...</h3>
+        <p id="aqi-advice" style="font-size: 15px; margin-bottom: 10px;">—</p>
+        <ul id="aqi-tips" style="font-size: 14px; line-height: 1.6; margin-left: 20px;"></ul>
+        <hr style="margin: 15px 0;">
+        <h4 style="margin-bottom: 8px;">📊 AQI Categories:</h4>
+        <ul style="font-size: 13px; margin-left: 20px; line-height: 1.5;">
+          <li><span style="color: #22c55e;">🟢 0–50: Good</span> – No risk</li>
+          <li><span style="color: #eab308;">🟡 51–100: Moderate</span> – Sensitive groups cautious</li>
+          <li><span style="color: #f97316;">🟠 101–150: Unhealthy (Sensitive)</span></li>
+          <li><span style="color: #ef4444;">🔴 151–200: Unhealthy</span></li>
+          <li><span style="color: #a855f7;">🟣 201–300: Very Unhealthy</span></li>
+          <li><span style="color: #7f1d1d;">⚫ 301+: Hazardous</span></li>
+        </ul>
+        <hr style="margin: 15px 0;">
+        <p style="font-size: 12px; color: #666; text-align: center;">Data powered by EcoSphere • 2025</p>
+      </div>
+    </section>
+    
+
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

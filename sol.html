@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solutions | EcoSphere</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+/* 📱 Responsive & Modern Permission-Popup Inspired UI */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f1f5f9;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #d1fae5;
+  padding: 16px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0 0 12px 12px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.top-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.top-nav a {
+  background-color: #ecfdf5;
+  border: 2px solid #16a34a;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 15px;
+  color: #065f46;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.top-nav a:hover {
+  background: #bbf7d0;
+  color: #064e3b;
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 24px auto 0;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#manualLocation {
+  width: 100%;
+  padding: 12px 50px 12px 16px;
+  font-size: 16px;
+  border: 2px solid #16a34a;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.2s;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.1);
+}
+
+#manualLocation:focus {
+  border-color: #065f46;
+  background: #f0fdf4;
+}
+
+#micBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #16a34a;
+  cursor: pointer;
+}
+
+#micBtn.listening {
+  animation: pulseMic 1s infinite ease-in-out;
+  color: red;
+}
+
+@keyframes pulseMic {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.2); }
+}
+
+#searchTooltip {
+  display: none;
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  color: #065f46;
+  border-left: 5px solid #16a34a;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 15px;
+  text-align: center;
+  animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 🧾 Chart Placeholder */
+#chartPlaceholder {
+  width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #f1f5f9,
+    #f1f5f9 10px,
+    #e2e8f0 10px,
+    #e2e8f0 20px
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #15803d;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 15px;
+  border: 2px dashed #22c55e;
+  box-shadow: inset 0 0 0 3px #bbf7d0;
+}
+
+.animated-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+}
+
+.animated-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(0, 160, 90, 0.15);
+}
+
+.emoji-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #16a34a;
+  margin-bottom: 6px;
+  animation: bounce 1.6s infinite ease-in-out;
+}
+
+.tip-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.tip-subtext {
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.tip-benefit {
+  font-size: 14px;
+  font-style: italic;
+  color: #0d9488;
+}
+
+.ai-icon {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  background: #e0f2fe;
+  color: #0284c7;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  animation: floaty 2.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+      
+    .search-wrapper {
+        position: relative;
+        flex: 1;
+      }
+      
+      #manualLocation {
+        width: 100%;
+        padding: 10px 40px 10px 10px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        outline: none;
+      }
+      
+      #micBtn {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #15803d;
+        transition: color 0.3s ease;
+      }
+      
+      #micBtn.listening {
+        animation: pulseMic 1s infinite ease-in-out;
+        color: red;
+      }
+      
+      @keyframes pulseMic {
+        0%, 100% { transform: translateY(-50%) scale(1); }
+        50% { transform: translateY(-50%) scale(1.2); }
+      }
+      
+      
+      .dashboard {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      
+
+      .search-container {
+        max-width: 600px;
+        margin: 20px auto 0;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 1;
+      }
+      
+      .search-top {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+      
+      .suggestion-box {
+        width: 100%;
+        position: relative;
+      }
+      
+      #suggestions {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        max-height: 220px;
+        overflow-y: auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        z-index: 99;
+        position: relative; /* fixes overlap! */
+      }
+      
+      #suggestions li {
+        padding: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      
+      #suggestions li:hover {
+        background-color: #f0fdf4;
+      }
+      
+      #loaderOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        z-index: 99999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        opacity: 1;
+        transition: opacity 0.6s ease-out, visibility 0.6s;
+      }
+      
+      #loaderOverlay.fade-out {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .eco-orbit-loader {
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      
+      .eco-core {
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, #22c55e, #16a34a);
+        border-radius: 50%;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 2;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        animation: pulseGlow 2s infinite ease-in-out;
+      }
+      
+      .orbit-ring {
+        width: 80px;
+        height: 80px;
+        border: 2px dashed rgba(34, 197, 94, 0.4);
+        border-radius: 50%;
+        position: absolute;
+        animation: spinRing 3s linear infinite;
+      }
+      
+      @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @keyframes pulseGlow {
+        0% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); transform: scale(1); }
+        50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); transform: scale(1.1); }
+        100% { box-shadow: 0 0 0px rgba(34, 197, 94, 0.3); transform: scale(1); }
+      }
+      
+      .loader-text {
+        margin-top: 16px;
+        font-weight: 500;
+        font-size: 15px;
+        color: #15803d;
+        animation: fadeText 2s ease-in-out infinite alternate;
+      }
+      
+      @keyframes fadeText {
+        0% { opacity: 0.4; }
+        100% { opacity: 1; }
+      }
+      
+      #loaderOverlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 1;
+        transition: opacity 0.6s ease-out, visibility 0.6s;
+      }
+    
+      #loaderOverlay.fade-out {
+        opacity: 0;
+        visibility: hidden;
+      }
+    
+      .spinner {
+        border: 8px solid #e5e7eb;
+        border-top: 8px solid #16a34a;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+      }
+    
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .search-container {
+        position: relative;
+        max-width: 400px;
+        margin: 20px auto 0;
+      }
+      
+      #manualLocation {
+        width: 100%;
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        outline: none;
+      }
+      
+      #suggestions {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #ccc;
+        border-top: none;
+        background: white;
+        position: absolute;
+        width: 100%;
+        z-index: 999;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      
+      #suggestions li {
+        padding: 10px;
+        cursor: pointer;
+      }
+      
+      #suggestions li:hover {
+        background-color: #f0fdf4;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #f0f4f8;
+        color: #333;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #d1fae5;
+        padding: 12px 20px;
+        flex-wrap: wrap;
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: bold;
+        color:#0ea5e9;
+
+      }
+
+      .top-nav a {
+        text-decoration: none;
+        color: #1f2937;
+        margin-left: 15px;
+        font-size: 16px;
+      }
+
+      .dashboard {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        vertical-align: top;
+
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        flex: 1 1 48%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .chart-card {
+        min-width: 300px;
+      }
+
+      canvas {
+        margin-bottom: 0;
+
+        width: 100% !important;
+        max-height: 300px;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard {
+          flex-direction: column;
+        }
+
+        .card {
+          flex: 1 1 100%;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .top-nav {
+          margin-top: 10px;
+        }
+
+        .top-nav a {
+          display: inline-block;
+          margin: 8px 10px 0 0;
+        }
+
+        h2 {
+          font-size: 18px;
+        }
+
+        #aqi-level-heading {
+          font-size: 16px;
+        }
+
+        #aqi-advice {
+          font-size: 14px;
+        }
+
+        #pollutionChart {
+          max-height: 250px;
+        }
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+      
+      .modal-box {
+        background: white;
+        max-width: 400px;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+      
+      .modal-box h3 {
+        margin-bottom: 10px;
+        color: #15803d;
+      }
+      
+      .modal-box p {
+        font-size: 15px;
+        margin-bottom: 20px;
+      }
+      
+      .modal-box button {
+        background: #16a34a;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      
+      .modal-box button:hover {
+        background: #15803d;
+      }
+
+      .search-container {
+        position: relative;
+        max-width: 600px;
+        margin: 20px auto 0;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      
+      #manualLocation {
+        flex: 1;
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        outline: none;
+      }
+      
+      #detectBtn {
+        padding: 10px 14px;
+        background: #16a34a;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s ease;
+      }
+      
+      #detectBtn:hover {
+        background: #15803d;
+      }
+      
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4fafd;
+    }
+    header {
+      background: #d1fae5;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .top-nav a {
+      text-decoration: none;
+      color: #1f2937;
+      margin-left: 15px;
+      font-size: 16px;
+    }
+    .solution-section {
+      background: #e0f7fa;
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .solution-section h2 {
+      text-align: center;
+      font-size: 28px;
+      color: #0077b6;
+      margin-bottom: 30px;
+    }
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .tip-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    }
+    .tip-card h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+    }
+    .tip-card p {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ai-title {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #15803d;
+    }
+    .ai-text {
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .scroll-down-indicator {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 28px;
+        color: #15803d;
+        animation: bounce 1.2s infinite ease-in-out;
+        cursor: pointer;
+        z-index: 1000;
+        transition: opacity 0.4s ease;
+      }
+      
+      .scroll-down-indicator.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      @keyframes bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(10px); }
+      }
+      .top-nav a {
+        text-decoration: none;
+        color: #1f2937;
+        margin-left: 12px;
+        font-size: 15px;
+        padding: 6px 12px;
+        border: 2px solid #16a34a;
+        border-radius: 8px;
+        background-color: #ecfdf5;
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+      
+      .top-nav a:hover {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-color: #15803d;
+      }
+      /* 🌐 Responsive Utilities for EcoSphere */
+@media (max-width: 1024px) {
+    .container, .solution-section {
+      padding: 20px;
+    }
+  
+    .tips-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+  
+    .forecast-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+  
+    .card, .tip-card {
+      padding: 16px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 10px;
+    }
+  
+    .top-nav a {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+  
+    h2, .solution-section h2 {
+      font-size: 22px;
+      text-align: center;
+    }
+  
+    .logo {
+      font-size: 18px;
+    }
+  
+    .weather-card h3 {
+      font-size: 15px;
+    }
+  
+    .tip-card p, .ai-text, .summary-box {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .forecast-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+  
+    .top-nav a {
+      font-size: 13px;
+      padding: 5px 10px;
+    }
+  
+    .logo {
+      font-size: 16px;
+      color:#0077b6;
+    }
+  
+    .tip-card {
+      font-size: 13px;
+      padding: 14px;
+    }
+  
+    .solution-section h2 {
+      font-size: 20px;
+    }
+  }
+  
+    
+  </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🥬 <strong>EcoSphere</strong></div>
+        <nav class="top-nav">
+          <a href="index.html">📊 Dashboard</a>
+          <a href="chatbot.html">🤖 Ask AI</a>
+          <a href="weather.html">🌤️ Weather Forecast</a>
+          <a href="sol.html">💡 Solutions</a>
+        </nav>
+      </header>
+      
+
+<main class="solution-section">
+  <h2>💧 What You Can Do – Save Water, Sustain Life</h2>
+  <div class="tips-grid" id="tipsGrid"></div>
+  <div id="scrollArrow" class="scroll-down-indicator hidden">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <polyline points="5 12 12 19 19 12" />
+    </svg>
+  </div>
+  
+  
+</main>
+
+<script src="sol.js"></script>
+    
+    <!-- Optional CSS animation -->
+    <style>
+      @keyframes bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(10px); }
+      }
+    </style>
+    
+
+</body>
+</html>
